@@ -1,0 +1,82 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id String @id @default(uuid())
+
+  real_name     String   @db.VarChar(40)
+  nick_name     String   @unique @db.VarChar(40)
+  birthday_date DateTime
+
+  hash_pass String
+  hash_rt   String?
+
+  socketId String?
+
+  createdAt DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+  Post       Post[]
+  PostLike   PostLike[]
+
+  @@map("users")
+}
+
+model Post {
+  id String @id @default(uuid())
+
+  owner_id     String
+  title        String @db.VarChar(40)
+  text_content String @db.Text
+
+  createdAt DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  owner         User            @relation(fields: [owner_id], references: [id], onDelete: Cascade)
+  PostLike      PostLike[]
+  UsersFeedback UsersFeedback[]
+
+  @@map("posts")
+}
+
+model UsersFeedback {
+  id String @id @default(uuid())
+
+  property String
+  score    Float
+
+  post_id String
+
+  post Post @relation(fields: [post_id], references: [id], onDelete: Cascade)
+}
+
+model PostLike {
+  id String @id @default(uuid())
+
+  user_id String
+  user    User   @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  post_id String
+  post    Post   @relation(fields: [post_id], references: [id], onDelete: Cascade)
+
+  @@map("post_likes")
+}
+
+model ChatMessage {
+  id         Int    @id @default(autoincrement())
+  senderId   String
+  receiverId String
+
+  message    String   @db.Text
+  createdAt DateTime @default(now())
+
+  @@map("chat_messages")
+}
