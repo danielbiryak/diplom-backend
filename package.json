@@ -6,7 +6,7 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "build": "nest build",
+    "build": "npm run migrate:push & nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "migrate:db": "npx prisma migrate dev",
     "migrate:push": "npx prisma db push",
