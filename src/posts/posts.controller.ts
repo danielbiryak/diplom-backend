@@ -3,6 +3,8 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
+  HttpStatus,
   Param,
   Post,
   Query,
@@ -22,7 +24,7 @@ export class PostController {
   @UseGuards(AuthGuard('jwt'))
   createPost(
     @Req() req: Request,
-    @Body() dto: CreatePostDto,
+    @Body() dto: CreatePostDto
   ) {
     const { user } = req
 
@@ -43,6 +45,16 @@ export class PostController {
     const user_id: string = req.user['sub']
 
     return this.postsService.likePost(user_id, post_id)
+  }
+
+  @Post('summarize')
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(AuthGuard('jwt'))
+  summarize(
+    @Body('post_text')
+    post_text: string
+  ) {
+    return this.postsService.summarize(post_text)
   }
 
   @Get()

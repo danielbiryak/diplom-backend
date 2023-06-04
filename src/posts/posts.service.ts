@@ -1,12 +1,11 @@
 import {
-  HttpCode,
   HttpException,
   HttpStatus,
   Injectable
 } from '@nestjs/common'
-import { Post } from '@prisma/client'
 import { PrismaService } from 'src/prisma/prisma.service'
 import { CreatePostDto } from './dto/createPost.dto'
+import { OpenAIApi, Configuration } from 'openai'
 
 @Injectable()
 export class PostsService {
@@ -153,6 +152,30 @@ export class PostsService {
         })
 
       return { likedPost: likePost }
+    }
+  }
+
+  async summarize(post_text: string) {
+    const openai = new OpenAIApi(
+      new Configuration({
+        apiKey: process.env.OPENAI_TOKEN
+      })
+    )
+    try {
+      const result = await openai.createCompletion({
+        model: 'text-davinci-003',
+        prompt: 'Summarize this post:\n\n' + post_text,
+        temperature: 0.7,
+        max_tokens: 1000,
+        top_p: 1.0,
+        frequency_penalty: 0.0,
+        presence_penalty: 1
+      })
+      // console.log(result)
+
+      return result.data.choices[0]
+    } catch (err) {
+      console.error(err.toJSON())
     }
   }
 
